@@ -46,7 +46,13 @@
                 currentQuestion.id
               )
             "
-            @click="showPdf = true"
+            @click="
+              () => {
+                console.log('Opening PDF modal');
+                console.log('PDF URL:', pdfUrl);
+                showPdf = true;
+              }
+            "
             class="btn-pdf"
           >
             Voir le plan du parking
@@ -209,7 +215,17 @@
     <!-- PDF Modal -->
     <div v-if="showPdf" class="modal">
       <div class="modal-content pdf-content">
-        <span class="close" @click="showPdf = false">&times;</span>
+        <button
+          class="close"
+          @click="
+            () => {
+              showPdf = false;
+              console.log('Closing PDF modal');
+            }
+          "
+        >
+          ×
+        </button>
         <iframe
           :src="pdfUrl"
           width="100%"
@@ -921,7 +937,8 @@ body {
 
 .btn-next,
 .btn-return,
-.btn-option {
+.btn-option,
+.btn-pdf {
   width: 100%;
   max-width: 400px;
   color: white;
@@ -945,6 +962,12 @@ body {
 .btn-option {
   background-color: #4a5a83;
   text-align: left;
+}
+
+.btn-pdf {
+  background-color: #3498db;
+  margin: 15px auto;
+  display: block;
 }
 
 .commune-dropdown {
@@ -1013,6 +1036,89 @@ body {
 
   .form-control {
     max-width: 90%;
+  }
+}
+
+.modal {
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1a1a1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: #1a1a1a;
+}
+
+.pdf-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.pdf-content iframe {
+  border: none;
+  width: 100%;
+  height: 100%;
+  background: white;
+}
+
+.close {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 10000;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.close::before,
+.close::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  background-color: white;
+  transform-origin: center;
+}
+
+.close::before {
+  transform: rotate(45deg);
+}
+
+.close::after {
+  transform: rotate(-45deg);
+}
+
+.close:hover {
+  opacity: 1;
+}
+
+@media screen and (min-width: 768px) {
+  .modal {
+    padding: 40px;
+  }
+
+  .modal-content {
+    max-width: 1200px;
+    margin: 0 auto;
   }
 }
 </style>
