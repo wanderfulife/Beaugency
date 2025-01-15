@@ -971,18 +971,16 @@ body {
 }
 
 .commune-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 400px;
+  position: relative;
+  width: 100%;
+  max-width: 400px;
   max-height: 200px;
   overflow-y: auto;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 0 0 5px 5px;
+  background-color: #333;
+  border: 1px solid #666;
+  border-radius: 5px;
   z-index: 1000;
-  margin: -10px 0 0 0;
+  margin: -10px auto 15px;
   padding: 0;
   list-style: none;
 }
@@ -990,11 +988,19 @@ body {
 .commune-option {
   padding: 10px;
   cursor: pointer;
-  color: #333;
+  color: white;
+  border-bottom: 1px solid #444;
 }
 
 .commune-option:hover {
-  background-color: #f0f0f0;
+  background-color: #444;
+}
+
+.station-input-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .logo {

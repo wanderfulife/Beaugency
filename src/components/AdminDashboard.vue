@@ -306,58 +306,138 @@ onMounted(() => {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .modal-content {
-  background-color: #2c3e50;
-  color: #ecf0f1;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 500px;
+  background-color: #2d3748;
+  color: white;
+  padding: 25px;
+  border-radius: 15px;
   width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
   position: relative;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  max-height: fit-content;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.signin-modal {
+  max-width: 320px;
+  padding: 20px;
+}
+
+.signin-modal h2 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  text-align: center;
+  font-weight: normal;
+}
+
+.signin-modal .form-control {
+  width: 100%;
+  margin-bottom: 15px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.signin-modal .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.signin-modal .btn-signin {
+  width: 100%;
+  margin: 0;
+  padding: 12px;
+  background-color: #68d391;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.signin-modal .btn-signin:hover {
+  background-color: #5cb67e;
 }
 
 .close {
-  position: fixed;
-  /* Change from absolute to fixed */
-  right: 20px;
-  top: 20px;
-  font-size: 28px;
-  font-weight: bold;
-  color: #bdc3c7;
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
   background: none;
   border: none;
   cursor: pointer;
-  z-index: 1010;
-  /* Ensure it's above other content */
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s;
 }
 
 .close:hover {
-  color: #ecf0f1;
+  opacity: 1;
+}
+
+.admin-dashboard {
+  max-width: 500px;
+  padding: 20px 30px;
+  height: auto;
+}
+
+.admin-dashboard h2 {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  text-align: center;
+  font-weight: normal;
+  color: white;
 }
 
 .dashboard-content {
-  display: grid;
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
 .dashboard-card {
-  background-color: #34495e;
-  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
   padding: 15px;
 }
 
 .dashboard-card h3 {
-  margin-top: 0;
-  color: #3498db;
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #3b82f6;
+  font-weight: normal;
+}
+
+.dashboard-card.total {
+  text-align: center;
+  padding: 12px;
+}
+
+.big-number {
+  font-size: 42px;
+  font-weight: bold;
+  color: #68d391;
+  margin: 5px 0;
 }
 
 .dashboard-card ul {
@@ -369,42 +449,55 @@ onMounted(() => {
 .dashboard-card li {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5px;
-}
-
-.big-number {
-  font-size: 3em;
-  font-weight: bold;
-  color: #2ecc71;
-  margin: 10px 0;
+  align-items: center;
+  padding: 6px 0;
+  color: white;
 }
 
 .count {
-  font-weight: bold;
-  color: #2ecc71;
+  font-weight: normal;
+  color: #68d391;
 }
 
-.form-control {
+.btn-download {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #34495e;
-  border-radius: 5px;
-  background-color: #34495e;
-  color: #ecf0f1;
+  padding: 12px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: normal;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 0;
+}
+
+.btn-download:hover {
+  background-color: #2563eb;
 }
 
 @media (max-width: 600px) {
   .modal-content {
-    width: 100%;
-    height: 100%;
-    border-radius: 0;
-    max-height: 100vh;
+    margin: 20px;
+    width: calc(100% - 40px);
   }
 
-  .close {
-    top: 10px;
-    right: 10px;
+  .admin-dashboard {
+    padding: 20px;
+  }
+
+  .admin-dashboard h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .dashboard-card {
+    padding: 12px;
+  }
+
+  .big-number {
+    font-size: 36px;
   }
 }
 </style>
