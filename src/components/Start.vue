@@ -121,6 +121,36 @@
               {{ isLastQuestion ? "Terminer" : "Suivant" }}
             </button>
           </div>
+          <!-- Street Input -->
+          <div v-else-if="currentQuestion.streetInput">
+            <div class="input-container">
+              <input
+                v-model="streetInput"
+                class="form-control"
+                type="text"
+                :placeholder="
+                  currentQuestion.freeTextPlaceholder || 'Saisissez une rue'
+                "
+              />
+              <ul v-if="showFilteredStreets" class="commune-dropdown">
+                <li
+                  v-for="street in filteredStreets"
+                  :key="street"
+                  @click="selectStreet(street)"
+                  class="commune-option"
+                >
+                  {{ street }}
+                </li>
+              </ul>
+            </div>
+            <button
+              @click="handleStreetSelection"
+              class="btn-next"
+              :disabled="!streetInput.trim()"
+            >
+              {{ isLastQuestion ? "Terminer" : "Suivant" }}
+            </button>
+          </div>
           <!-- Multiple Choice Questions -->
           <div v-else-if="!currentQuestion.freeText">
             <div
@@ -220,7 +250,9 @@ const postalCodePrefix = ref("");
 const showPdf = ref(false);
 const pdfUrl = ref("/Plan.pdf");
 const stationInput = ref("");
+const streetInput = ref("");
 const filteredStations = ref([]);
+const filteredStreets = ref([]);
 
 // Firestore refs
 const surveyCollectionRef = collection(db, "Beaugency");
@@ -279,6 +311,209 @@ const stationsList = [
   "Paris Montparnasse",
 ];
 
+const streetsList = [
+  "Allée de Flore",
+  "Allée de la Perrine",
+  "Allée de la Roseraie",
+  "Allée de l'Oratoire",
+  "Allée des Bleuets",
+  "Allée des Coquelicots",
+  "Allée des Galeries",
+  "Allée Edwige Feuillère",
+  "Allée Pierre de Ronsard",
+  "Allee des Tilleuls",
+  "Avenue de Blois",
+  "Avenue de Chambord",
+  "Avenue de la Procession",
+  "Avenue de Vendôme",
+  "Avenue des Chaussées",
+  "Avenue des Clos Neufs",
+  "Avenue des Hauts de Lutz",
+  "Avenue d'Orléans",
+  "Avenue du Colonel Morlaix Demozay",
+  "Avenue Jules Lemaître",
+  "Avenue Longchamps",
+  "Avenue Pierre de Félice",
+  "Chemin de Fins à la Mairie",
+  "Chemin de la Caillotière",
+  "Chemin de Marchebault",
+  "Chemin des Buissons",
+  "Chemin des Fourneaux",
+  "Chemin des Grandes Gibaudières",
+  "Chemin des Quatre Vents",
+  "Chemin du Verger aux Laurières",
+  "Clos de la Chapelle",
+  "Clos de Lutz",
+  "Clos des Fourneaux",
+  "Clos des Iles",
+  "Cul de Sac des Cornes",
+  "Impasse Clos Saint Jean",
+  "Impasse de Bel Air",
+  "Impasse de la Bergerie",
+  "Impasse de la Ganache",
+  "Impasse de la Monnaie",
+  "Impasse de la Sourcière",
+  "Impasse de la Touanne",
+  "Impasse des Belles",
+  "Impasse des Capucins",
+  "Impasse des Caves d'Igoire",
+  "Impasse des Clos Neufs",
+  "Impasse des Laurières",
+  "Impasse des Toits",
+  "Impasse du Colombier",
+  "Impasse Jules Lemaitre",
+  "Impasse Oseille",
+  "Impasse Saint Michel",
+  "La Pointe des Fourneaux",
+  "Lieu Dit le Grand Mail",
+  "Place du Docteur Hyvernaud",
+  "Place du Martroi",
+  "Place du Petit Marché",
+  "Place du Puits Gaillard",
+  "Place Dunois",
+  "Place Saint-firmin",
+  "Promenade de Barchelin",
+  "Quai de l'Abbaye",
+  "Quai Dunois",
+  "Route de Lailly En Val",
+  "Route de Messas",
+  "Route de Saint-Laurent",
+  "Route du Val",
+  "Rue Bêche Fève",
+  "Rue Basse",
+  "Rue Bernasse",
+  "Rue Cassandre Salviati",
+  "Rue Cave d'Igoire",
+  "Rue Collinet Rousseau",
+  "Rue Croque Motte",
+  "Rue de Beauvilliers",
+  "Rue de Bel Air",
+  "Rue de Chateaudun",
+  "Rue de Garambault",
+  "Rue de la Beauce",
+  "Rue de la Bonde",
+  "Rue de la Boulangerie",
+  "Rue de la Bretonnerie",
+  "Rue de la Cordonnerie",
+  "Rue de la Couture",
+  "Rue de la Croix Nas",
+  "Rue de la Fontaine Appia",
+  "Rue de la Fontaine aux Clercs",
+  "Rue de la Fossé aux Loups",
+  "Rue de la Gare",
+  "Rue de la Maille d'Or",
+  "Rue de la Mardelle",
+  "Rue de la Moissonnière",
+  "Rue de la Pierre Blanche",
+  "Rue de la Pointe Maubinée",
+  "Rue de la Poterie",
+  "Rue de la Sirène",
+  "Rue de la Source",
+  "Rue de la Sourciere",
+  "Rue de la Tête Noire",
+  "Rue de l'Abattoir",
+  "Rue de l'Abbaye",
+  "Rue de l'Abreuvoir",
+  "Rue de l'Eglise",
+  "Rue de l'Evêché",
+  "Rue de l'Orme",
+  "Rue de l'Orme à la Chêvre",
+  "Rue de l'Ours",
+  "Rue de l'Oursine",
+  "Rue de Meung",
+  "Rue de Pierre Couverte",
+  "Rue de Vétille",
+  "Rue d'Entre-deux aux Vallées",
+  "Rue des 4 Nations",
+  "Rue des Acacias",
+  "Rue des Aigres Feuilles",
+  "Rue des Baltants",
+  "Rue des Belettes",
+  "Rue des Bruyeres",
+  "Rue des Capucins",
+  "Rue des Champs de Veaux",
+  "Rue des Champs Fleuris",
+  "Rue des Champs Poulains",
+  "Rue des Chardonnerets",
+  "Rue des Chevaliers",
+  "Rue des Cygnes",
+  "Rue des Etuves",
+  "Rue des Fontaines",
+  "Rue des Forges",
+  "Rue des Germines",
+  "Rue des Grottes",
+  "Rue des Iles",
+  "Rue des Jonquilles",
+  "Rue des Laurières",
+  "Rue des Mésanges",
+  "Rue des Marais",
+  "Rue des Marmousets",
+  "Rue des Ormeaux",
+  "Rue des Quatre Fournils",
+  "Rue des Querres",
+  "Rue des Quintaux",
+  "Rue des Relais",
+  "Rue des Sablons",
+  "Rue des sous Lutz",
+  "Rue des Tanneurs",
+  "Rue des Toits",
+  "Rue des Trois Marchands",
+  "Rue des Vieux Fossés",
+  "Rue des Vignes",
+  "Rue du Belier",
+  "Rue du Cabris",
+  "Rue du Château d'Eau",
+  "Rue du Change",
+  "Rue du Chat Qui Dort",
+  "Rue du Clos des Belles",
+  "Rue du Clos Saint Jean",
+  "Rue du Colombier",
+  "Rue du Cormier",
+  "Rue du Faubourg Porte Dieu",
+  "Rue du Four à Chaux",
+  "Rue du Gris Meunier",
+  "Rue du Gros Vilain",
+  "Rue du Martroi",
+  "Rue du Moulin à Vent",
+  "Rue du Moulin Rouge",
+  "Rue du Physicien Jacques Charles",
+  "Rue du Pissot",
+  "Rue du Poët Chaumont",
+  "Rue du Pont",
+  "Rue du Pouêt de Levrault",
+  "Rue du Prateau",
+  "Rue du Puits Chaumont",
+  "Rue du Puits de l'Ange",
+  "Rue du Puits Manu",
+  "Rue du Puits Roussy",
+  "Rue du RÛ",
+  "Rue du Ravelin",
+  "Rue du Saint-esprit",
+  "Rue du Traineau",
+  "Rue du Val Macé",
+  "Rue Fourniere",
+  "Rue Jean Voisin",
+  "Rue Joachim du Bellay",
+  "Rue Jules Lemaître",
+  "Rue Julie Lour",
+  "Rue les Haies Frisées",
+  "Rue Nationale",
+  "Rue Oseille",
+  "Rue Porte aux Febvres",
+  "Rue Porte Dieu",
+  "Rue Porte Tavers",
+  "Rue Porte Vendômoise",
+  "Rue Robert Bothereau",
+  "Rue Saint Gentien",
+  "Rue Saint Michel",
+  "Rue Saint-calais",
+  "Rue Tardenoisienne",
+  "Sentier de Levrault",
+  "Sentier des Champs de Veaux",
+  "Sentier des sous Lutz",
+  "Venelle Badin",
+];
+
 // Computed properties
 const currentQuestion = computed(() => {
   return currentQuestionIndex.value >= 0 &&
@@ -289,6 +524,10 @@ const currentQuestion = computed(() => {
 
 const showFilteredStations = computed(
   () => stationInput.value.length > 0 && filteredStations.value.length > 0
+);
+
+const showFilteredStreets = computed(
+  () => streetInput.value.length > 0 && filteredStreets.value.length > 0
 );
 
 const canGoBack = computed(() => questionPath.value.length > 1);
@@ -324,9 +563,21 @@ const filterStations = () => {
   );
 };
 
+const filterStreets = () => {
+  const input = streetInput.value.toLowerCase();
+  filteredStreets.value = streetsList.filter((street) =>
+    street.toLowerCase().includes(input)
+  );
+};
+
 const selectStation = (station) => {
   stationInput.value = station;
   filteredStations.value = [];
+};
+
+const selectStreet = (street) => {
+  streetInput.value = street;
+  filteredStreets.value = [];
 };
 
 // Methods
@@ -385,6 +636,15 @@ const selectAnswer = (option, index) => {
 
 const handleFreeTextAnswer = () => {
   if (currentQuestion.value) {
+    // Skip for street questions since they're handled by handleStreetSelection
+    if (
+      currentQuestion.value.id === "Q2a" ||
+      currentQuestion.value.id === "Q2a_d" ||
+      currentQuestion.value.id === "Q2a_nv"
+    ) {
+      return;
+    }
+
     answers.value[currentQuestion.value.id] = freeTextAnswer.value;
     if (currentQuestionIndex.value < questions.length - 1) {
       nextQuestion();
@@ -417,9 +677,54 @@ const handleStationSelection = () => {
   }
 };
 
-// Add this watch
+const handleStreetSelection = () => {
+  if (streetInput.value.trim() !== "") {
+    const isListedStreet = streetsList.includes(streetInput.value);
+    const questionId = currentQuestion.value.id;
+
+    // Store the answer based on the question ID
+    if (questionId === "Q2a") {
+      answers.value["Q2a"] = streetInput.value;
+      if (!isListedStreet) {
+        answers.value["Q2a_CUSTOM"] = streetInput.value;
+      }
+    } else if (questionId === "Q2a_d") {
+      answers.value["Q2a_d"] = streetInput.value;
+      if (!isListedStreet) {
+        answers.value["Q2a_d_CUSTOM"] = streetInput.value;
+      }
+    } else if (questionId === "Q2a_nv") {
+      answers.value["Q2a_nv"] = streetInput.value;
+      if (!isListedStreet) {
+        answers.value["Q2a_nv_CUSTOM"] = streetInput.value;
+      }
+    }
+
+    // Force move to next question
+    const nextQuestionId = currentQuestion.value.next;
+    if (nextQuestionId === "end") {
+      finishSurvey();
+    } else {
+      const nextIndex = questions.findIndex((q) => q.id === nextQuestionId);
+      if (nextIndex !== -1) {
+        currentQuestionIndex.value = nextIndex;
+        questionPath.value.push(nextQuestionId);
+      }
+    }
+
+    // Reset the input
+    streetInput.value = "";
+    filteredStreets.value = [];
+  }
+};
+
+// Add these watches
 watch(stationInput, () => {
   filterStations();
+});
+
+watch(streetInput, () => {
+  filterStreets();
 });
 
 const updateSelectedCommune = (value) => {
@@ -575,22 +880,8 @@ body {
   color: white;
 }
 
-/* Center the Start Survey button horizontally and vertically */
-.start-survey-container {
-  justify-content: center;
-  /* Center horizontally */
-  align-items: center;
-  /* Center vertically */
-  height: 50vh;
-  /* Full viewport height */
-  width: 100%;
-  /* Full width */
-  margin-bottom: 5%;
-}
-
 .content-container {
   flex-grow: 1;
-  /* This allows the content to take up available space */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -600,7 +891,6 @@ body {
   margin: 0 auto;
   box-sizing: border-box;
   overflow-y: auto;
-  /* Allow scrolling if content overflows */
 }
 
 .question-container {
@@ -608,23 +898,18 @@ body {
   margin-bottom: 30px;
 }
 
-.input-container {
+.input-container,
+.station-input-container {
   display: flex;
-  justify-content: center;
-  /* Center horizontally */
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  /* Take full width of the parent */
-}
-
-h2 {
-  text-align: center;
-  width: 100%;
+  position: relative;
 }
 
 .form-control {
   width: 100%;
   max-width: 400px;
-  /* Maximum width of the input */
   padding: 10px;
   border-radius: 5px;
   border: 1px solid white;
@@ -632,8 +917,6 @@ h2 {
   color: white;
   font-size: 16px;
   margin-bottom: 15px;
-  box-sizing: border-box;
-  outline: none;
 }
 
 .btn-next,
@@ -664,6 +947,33 @@ h2 {
   text-align: left;
 }
 
+.commune-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 0 0 5px 5px;
+  z-index: 1000;
+  margin: -10px 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.commune-option {
+  padding: 10px;
+  cursor: pointer;
+  color: #333;
+}
+
+.commune-option:hover {
+  background-color: #f0f0f0;
+}
+
 .logo {
   max-width: 25%;
   height: auto;
@@ -677,28 +987,6 @@ h2 {
   text-align: center;
   width: 100%;
   box-sizing: border-box;
-  position: relative;
-  /* Keep the footer relative to its parent */
-}
-
-.btn-download {
-  background-color: #ffffff;
-  color: #4c4faf;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 25px;
-  transition: all 0.3s ease;
-  margin-bottom: 15px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.doc-count {
-  font-size: 14px;
-  opacity: 0.9;
 }
 
 .progress-bar {
@@ -716,114 +1004,15 @@ h2 {
   transition: width 0.3s ease-in-out;
 }
 
-.commune-dropdown {
-  max-height: 200px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-}
-
-.commune-option {
-  padding: 5px;
-  cursor: pointer;
-}
-
-.commune-option:hover {
-  background-color: #f0f0f0;
-}
-
-@media screen and (max-width: 768px) {
-  .question-container {
-    margin-bottom: 20px;
-  }
-
-  .btn-return {
-    margin-top: 20px;
-  }
-
-  .logo {
-    margin-top: 30px;
-  }
-}
-
-/* Ensure responsive centering */
 @media screen and (max-width: 480px) {
-  .form-control {
-    max-width: 100%;
-    /* Ensure full width on small screens */
+  .commune-dropdown {
+    width: 90%;
+    left: 50%;
+    transform: translateX(-50%);
   }
-}
-.btn-pdf {
-  background-color: #ff9800;
-  /* Orange color to make it distinct */
-  color: white;
-  padding: 15px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  transition: background-color 0.3s;
-}
 
-.btn-pdf:hover {
-  background-color: #f57c00;
-  /* Darker orange on hover */
-}
-
-.modal {
-  display: flex;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.4);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background-color: #fefefe;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 90%;
-  max-width: 800px;
-  position: relative;
-}
-
-.pdf-content {
-  height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-  position: absolute;
-  right: 10px;
-  top: 5px;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-/* Ensure the PDF fits within the modal */
-.pdf-content iframe {
-  flex-grow: 1;
-  border: none;
-  margin-top: 20px;
+  .form-control {
+    max-width: 90%;
+  }
 }
 </style>

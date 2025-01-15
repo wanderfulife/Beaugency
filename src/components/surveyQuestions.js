@@ -26,7 +26,7 @@ export const questions = [
 	{
 		id: "Q2a",
 		text: "De quelle rue de Beaugency venez-vous ?",
-		freeText: true,
+		streetInput: true,
 		freeTextPlaceholder: "Nom de la rue",
 		next: "Q3",
 	},
@@ -178,7 +178,7 @@ export const questions = [
 	{
 		id: "Q2a_d",
 		text: "Vers quelle rue de Beaugency allez-vous ?",
-		freeText: true,
+		streetInput: true,
 		freeTextPlaceholder: "Nom de la rue",
 		next: "Q3_d",
 	},
@@ -323,7 +323,7 @@ export const questions = [
 	{
 		id: "Q2a_nv",
 		text: "De quelle rue de Beaugency venez-vous ?",
-		freeText: true,
+		streetInput: true,
 		freeTextPlaceholder: "Nom de la rue",
 		next: "Q3_nv",
 	},
