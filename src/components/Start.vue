@@ -192,6 +192,14 @@
           <button @click="previousQuestion" class="btn-return" v-if="canGoBack">
             Retour
           </button>
+          <!-- Partial Validation Button -->
+          <button
+            v-if="showPartialValidation"
+            @click="handlePartialValidation"
+            class="btn-partial"
+          >
+            Validation partielle
+          </button>
         </div>
       </div>
 
@@ -872,6 +880,76 @@ const getNextId = async () => {
   return `Beaugency-${counter.toString().padStart(6, "0")}`;
 };
 
+// Add computed property for showing partial validation button
+const showPartialValidation = computed(() => {
+  if (!currentQuestion.value) return false;
+
+  // Check if we're on the correct path based on Q1 answer
+  const isPassengerPath = answers.value["Q1"] === 1;
+  const isDescendedPath = answers.value["Q1"] === 2;
+
+  // Get the relevant Q5 question ID based on the path
+  const relevantQ5 = isPassengerPath ? "Q5" : isDescendedPath ? "Q5_d" : null;
+
+  if (!relevantQ5) return false;
+
+  // Find the index of the relevant Q5
+  const q5Index = questions.findIndex((q) => q.id === relevantQ5);
+  if (q5Index === -1) return false;
+
+  // Show button if we're at or past the relevant Q5 and have valid input
+  return (
+    currentQuestionIndex.value >= q5Index &&
+    (currentQuestion.value.id === relevantQ5
+      ? stationInput.value.trim() !== ""
+      : currentQuestion.value.freeText
+      ? freeTextAnswer.value.trim() !== ""
+      : currentQuestion.value.streetInput
+      ? streetInput.value.trim() !== ""
+      : true)
+  );
+});
+
+// Modify handlePartialValidation to save current answer before finishing
+const handlePartialValidation = async () => {
+  // Save current answer based on question type
+  if (currentQuestion.value) {
+    if (
+      currentQuestion.value.id === "Q5" ||
+      currentQuestion.value.id === "Q5_d"
+    ) {
+      const isListedStation = stationsList.includes(stationInput.value);
+      if (currentQuestion.value.id === "Q5") {
+        answers.value["Q5"] = stationInput.value;
+        if (!isListedStation) {
+          answers.value["Q5_CUSTOM"] = stationInput.value;
+        }
+      } else {
+        answers.value["Q5_d"] = stationInput.value;
+        if (!isListedStation) {
+          answers.value["Q5_d_CUSTOM"] = stationInput.value;
+        }
+      }
+    } else if (currentQuestion.value.streetInput) {
+      const isListedStreet = streetsList.includes(streetInput.value);
+      const questionId = currentQuestion.value.id;
+      answers.value[questionId] = streetInput.value;
+      if (!isListedStreet) {
+        answers.value[`${questionId}_CUSTOM`] = streetInput.value;
+      }
+    } else if (currentQuestion.value.freeText) {
+      answers.value[currentQuestion.value.id] = freeTextAnswer.value;
+    }
+  }
+
+  // Save the survey
+  await finishSurvey();
+
+  // Start a new survey immediately
+  resetSurvey();
+  startSurvey();
+};
+
 // Lifecycle hooks
 onMounted(() => {
   getDocCount();
@@ -1126,5 +1204,18 @@ body {
     max-width: 1200px;
     margin: 0 auto;
   }
+}
+
+.btn-partial {
+  width: 100%;
+  max-width: 400px;
+  color: white;
+  padding: 15px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  background-color: #ff9800;
 }
 </style>
