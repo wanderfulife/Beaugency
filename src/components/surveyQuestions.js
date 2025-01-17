@@ -1,5 +1,14 @@
 export const questions = [
 	{
+		id: "Poste",
+		text: "Poste",
+		askOncePerSession: true,
+		options: [
+			{ text: "Quai1 - Direction Tours", next: "Q1" },
+			{ text: "Quai2 - Direction Orléans", next: "Q1" },
+		],
+	},
+	{
 		id: "Q1",
 		text: "Quelle est la raison de votre présence en gare ?",
 		options: [
@@ -404,3 +413,6 @@ export const questions = [
 		next: "end",
 	},
 ];
+
+
+

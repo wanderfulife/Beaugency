@@ -277,6 +277,7 @@ const stationInput = ref("");
 const streetInput = ref("");
 const filteredStations = ref([]);
 const filteredStreets = ref([]);
+const selectedPoste = ref(null);
 
 // Firestore refs
 const surveyCollectionRef = collection(db, "Beaugency");
@@ -619,13 +620,30 @@ const startSurvey = () => {
     second: "2-digit",
   });
   currentStep.value = "survey";
-  currentQuestionIndex.value = 0;
   answers.value = {};
   isSurveyComplete.value = false;
+
+  // Check if Poste was already selected in this session
+  const sessionPoste = sessionStorage.getItem("selectedPoste");
+  if (sessionPoste) {
+    // Skip Poste question and start from Q1
+    selectedPoste.value = sessionPoste;
+    answers.value["Poste"] = sessionPoste;
+    currentQuestionIndex.value = 1; // Skip Poste question
+  } else {
+    // Start with Poste question
+    currentQuestionIndex.value = 0;
+  }
 };
 
 const selectAnswer = (option, index) => {
   if (currentQuestion.value) {
+    // Special handling for Poste question
+    if (currentQuestion.value.id === "Poste") {
+      selectedPoste.value = option.text;
+      sessionStorage.setItem("selectedPoste", option.text);
+    }
+
     answers.value[currentQuestion.value.id] = index + 1;
 
     // Special handling for Q2 and Q2_nonvoyageur
@@ -643,7 +661,7 @@ const selectAnswer = (option, index) => {
             ? "Q2_d"
             : "Q2_nv";
         answers.value[`Q2_COMMUNE`] = "BEAUGENCY";
-        answers.value["CODE_INSEE"] = "45028"; // INSEE code for Lorient
+        answers.value["CODE_INSEE"] = "45028";
         answers.value["COMMUNE_LIBRE"] = "";
       }
     }
@@ -827,7 +845,8 @@ const finishSurvey = async () => {
   const isPassenger = answers.value["Q1"] === 1;
   const questionPrefix = isPassenger ? "Q2" : "Q2_nonvoyageur";
 
-  await addDoc(surveyCollectionRef, {
+  // Create a new answers object with Poste first
+  const orderedAnswers = {
     ID_questionnaire: uniqueId,
     HEURE_DEBUT: startDate.value,
     DATE: now.toLocaleDateString("fr-FR").replace(/\//g, "-"),
@@ -838,13 +857,22 @@ const finishSurvey = async () => {
       minute: "2-digit",
       second: "2-digit",
     }),
+    Poste: selectedPoste.value,
     TYPE_QUESTIONNAIRE: isPassenger ? "Passager" : "Non-passager",
     [`${questionPrefix}_COMMUNE`]:
       answers.value[`${questionPrefix}_COMMUNE`] || "",
     CODE_INSEE: answers.value["CODE_INSEE"] || "",
-    ...answers.value,
+  };
+
+  // Add the rest of the answers
+  Object.keys(answers.value).forEach((key) => {
+    if (key !== "Poste") {
+      // Skip Poste as it's already added
+      orderedAnswers[key] = answers.value[key];
+    }
   });
 
+  await addDoc(surveyCollectionRef, orderedAnswers);
   await getDocCount();
 };
 
@@ -856,6 +884,7 @@ const resetSurvey = () => {
   questionPath.value = ["Q1"];
   freeTextAnswer.value = "";
   isSurveyComplete.value = false;
+  // Note: We don't clear selectedPoste or sessionStorage
 };
 
 const getDocCount = async () => {
