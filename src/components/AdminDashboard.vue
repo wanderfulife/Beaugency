@@ -132,8 +132,14 @@ const fetchAdminData = async () => {
     }, {});
 
     surveysByType.value = surveys.reduce((acc, survey) => {
-      const type =
-        survey.TYPE_QUESTIONNAIRE === "Passager" ? "Passager" : "Non-passager";
+      let type;
+      if (survey.Q1 === 1) {
+        type = "Montant";
+      } else if (survey.Q1 === 2) {
+        type = "Descendant";
+      } else {
+        type = "Non-voyageur";
+      }
       acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {});
@@ -211,6 +217,17 @@ const downloadData = async () => {
       const docData = doc.data();
       return headerOrder.reduce((acc, key) => {
         switch (key) {
+          case "TYPE_QUESTIONNAIRE":
+            let type;
+            if (docData.Q1 === 1) {
+              type = "Montant";
+            } else if (docData.Q1 === 2) {
+              type = "Descendant";
+            } else {
+              type = "Non-voyageur";
+            }
+            acc[key] = type;
+            break;
           case "COMMUNE_LIBRE":
             acc[key] = docData["COMMUNE_LIBRE"] || "";
             break;
