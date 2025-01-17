@@ -622,17 +622,21 @@ const startSurvey = () => {
   currentStep.value = "survey";
   answers.value = {};
   isSurveyComplete.value = false;
+  questionPath.value = ["Poste"]; // Always start with Poste in the path
+  currentQuestionIndex.value = 0; // Always start at index 0 (Poste)
 
   // Check if Poste was already selected in this session
   const sessionPoste = sessionStorage.getItem("selectedPoste");
   if (sessionPoste) {
-    // Skip Poste question and start from Q1
+    // If Poste was already selected, move to Q1
     selectedPoste.value = sessionPoste;
-    answers.value["Poste"] = sessionPoste;
-    currentQuestionIndex.value = 1; // Skip Poste question
-  } else {
-    // Start with Poste question
-    currentQuestionIndex.value = 0;
+    // Find the index of the stored Poste text
+    const posteIndex = questions[0].options.findIndex(
+      (opt) => opt.text === sessionPoste
+    );
+    answers.value["Poste"] = posteIndex + 1; // Store index + 1
+    currentQuestionIndex.value = 1;
+    questionPath.value = ["Poste", "Q1"];
   }
 };
 
@@ -642,9 +646,10 @@ const selectAnswer = (option, index) => {
     if (currentQuestion.value.id === "Poste") {
       selectedPoste.value = option.text;
       sessionStorage.setItem("selectedPoste", option.text);
+      answers.value["Poste"] = index + 1; // Store index + 1 instead of text
+    } else {
+      answers.value[currentQuestion.value.id] = index + 1;
     }
-
-    answers.value[currentQuestion.value.id] = index + 1;
 
     // Special handling for Q2 and Q2_nonvoyageur
     if (
@@ -802,8 +807,13 @@ const nextQuestion = (forcedNextId = null) => {
     nextQuestionId = currentQuestion.value.next;
     if (!currentQuestion.value.freeText) {
       const selectedAnswer = answers.value[currentQuestion.value.id];
-      const selectedOption = currentQuestion.value.options[selectedAnswer - 1];
-      nextQuestionId = selectedOption?.next || null;
+      if (currentQuestion.value.id === "Poste") {
+        nextQuestionId = "Q1";
+      } else {
+        const selectedOption =
+          currentQuestion.value.options[selectedAnswer - 1];
+        nextQuestionId = selectedOption?.next || null;
+      }
     }
   }
 
@@ -820,18 +830,49 @@ const nextQuestion = (forcedNextId = null) => {
     }
   }
 };
+
 const previousQuestion = () => {
   if (canGoBack.value) {
-    questionPath.value.pop();
+    // Remove current question from path
+    const currentQuestionId = questionPath.value.pop();
     const previousQuestionId =
       questionPath.value[questionPath.value.length - 1];
+
+    // Find indices
     const previousIndex = questions.findIndex(
       (q) => q.id === previousQuestionId
     );
+
     if (previousIndex !== -1) {
+      // Update current question index
       currentQuestionIndex.value = previousIndex;
-      delete answers.value[questions[currentQuestionIndex.value].id];
+
+      // Clear current question's answers
+      if (currentQuestionId) {
+        // Clear main answer
+        delete answers.value[currentQuestionId];
+
+        // Clear any custom/additional fields
+        delete answers.value[`${currentQuestionId}_CUSTOM`];
+
+        // Clear special fields for commune questions
+        if (currentQuestionId.includes("Q2")) {
+          delete answers.value["Q2_COMMUNE"];
+          delete answers.value["CODE_INSEE"];
+          delete answers.value["COMMUNE_LIBRE"];
+        }
+      }
+
+      // Reset all input fields
       freeTextAnswer.value = "";
+      stationInput.value = "";
+      streetInput.value = "";
+      selectedCommune.value = "";
+      postalCodePrefix.value = "";
+
+      // Clear filtered lists
+      filteredStations.value = [];
+      filteredStreets.value = [];
     }
   }
 };
@@ -857,7 +898,7 @@ const finishSurvey = async () => {
       minute: "2-digit",
       second: "2-digit",
     }),
-    Poste: selectedPoste.value,
+    Poste: answers.value["Poste"],
     TYPE_QUESTIONNAIRE: isPassenger ? "Passager" : "Non-passager",
     [`${questionPrefix}_COMMUNE`]:
       answers.value[`${questionPrefix}_COMMUNE`] || "",
