@@ -98,7 +98,8 @@
           <!-- Dropdown for Q5 -->
           <div
             v-else-if="
-              currentQuestion.id === 'Q5' || currentQuestion.id === 'Q5_d'
+              currentQuestion.id === 'Q5_stations' ||
+              currentQuestion.id === 'Q5_d_stations'
             "
           >
             <div class="station-input-container">
@@ -284,7 +285,6 @@ const surveyCollectionRef = collection(db, "Beaugency");
 const counterDocRef = doc(db, "counters", "surveyCounter");
 
 // Stations list
-
 
 const stationsList = [
   "Amboise",
@@ -668,12 +668,12 @@ const handleStationSelection = () => {
     const isListedStation = stationsList.includes(stationInput.value);
     const questionId = currentQuestion.value.id;
 
-    if (questionId === "Q5") {
+    if (questionId === "Q5_stations") {
       answers.value["Q5"] = stationInput.value;
       if (!isListedStation) {
         answers.value["Q5_CUSTOM"] = stationInput.value;
       }
-    } else if (questionId === "Q5_d") {
+    } else if (questionId === "Q5_d_stations") {
       answers.value["Q5_d"] = stationInput.value;
       if (!isListedStation) {
         answers.value["Q5_d_CUSTOM"] = stationInput.value;
@@ -974,7 +974,6 @@ const handlePartialValidation = async () => {
   await finishSurvey();
 
   // Start a new survey immediately
-  resetSurvey();
   startSurvey();
 };
 

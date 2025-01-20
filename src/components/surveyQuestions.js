@@ -111,6 +111,14 @@ export const questions = [
 	{
 		id: "Q5",
 		text: "Pour ce trajet en train, quelle sera votre gare de destination finale ?",
+		options: [
+			{ text: "Austerlitz", next: "Q6" },
+			{ text: "Autre", next: "Q5_stations" },
+		],
+	},
+	{
+		id: "Q5_stations",
+		text: "Veuillez sélectionner votre gare de destination :",
 		freeText: true,
 		freeTextPlaceholder: "Nom de la gare",
 		next: "Q6",
@@ -265,7 +273,15 @@ export const questions = [
 
 	{
 		id: "Q5_d",
-		text: "Pour ce trajet en train, quelle a été votre gare de montée ?",
+		text: "De quelle gare venez-vous ?",
+		options: [
+			{ text: "Austerlitz", next: "Q6_d" },
+			{ text: "Autre", next: "Q5_d_stations" },
+		],
+	},
+	{
+		id: "Q5_d_stations",
+		text: "Veuillez sélectionner votre gare de départ :",
 		freeText: true,
 		freeTextPlaceholder: "Nom de la gare",
 		next: "Q6_d",
