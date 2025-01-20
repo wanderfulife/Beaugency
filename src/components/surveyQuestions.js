@@ -1,14 +1,5 @@
 export const questions = [
 	{
-		id: "Poste",
-		text: "Poste",
-		askOncePerSession: true,
-		options: [
-			{ text: "Quai1 - Direction Tours", next: "Q1" },
-			{ text: "Quai2 - Direction Orléans", next: "Q1" },
-		],
-	},
-	{
 		id: "Q1",
 		text: "Quelle est la raison de votre présence en gare ?",
 		options: [
@@ -80,9 +71,9 @@ export const questions = [
 		id: "Q3b",
 		text: "Où vous êtes-vous fait déposer ?",
 		options: [
-			{ text: "Au niveau de la dépose-minute devant le bâtiment voyageur au Nord", next: "Q4" },
-			{ text: "Au niveau du parking ou de la rue Beauvais au Nord", next: "Q4" },
-			{ text: "Au niveau de la dépose-minute devant le parvis au Sud", next: "Q4" },
+			{ text: "Au niveau de la dépose-minute devant le bâtiment voyageur au Sud", next: "Q4" },
+			{ text: "Sur le parking de la gare", next: "Q4" },
+			{ text: "Directement sur la rue de la Gare devant la gare", next: "Q4" },
 			{ text: "Autre", next: "Q3b_precision", requiresPrecision: true },
 		],
 	},
@@ -115,7 +106,6 @@ export const questions = [
 		options: [
 			{ text: "Oui", next: "Q5" },
 			{ text: "Non", next: "Q5" },
-			{ text: "Non mais j'envisage d'en prendre un dans les mois qui viennent", next: "Q5" },
 		],
 	},
 	{

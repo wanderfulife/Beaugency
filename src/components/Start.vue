@@ -284,56 +284,41 @@ const surveyCollectionRef = collection(db, "Beaugency");
 const counterDocRef = doc(db, "counters", "surveyCounter");
 
 // Stations list
+
+
 const stationsList = [
-  "Brest",
-  "Kerhuon",
-  "La Forest-Landerneau",
-  "Landerneau",
-  "Dirinon",
-  "Pont-de-Buis",
-  "Châteaulin",
-  "Quimper",
-  "Rosporden",
-  "Bannalec",
-  "Quimperlé",
-  "Gestel",
-  "Hennebont",
-  "Brandérion",
-  "Landévant",
-  "Landaul – Mendon",
-  "Auray",
-  "Sainte-Anne",
-  "Vannes",
-  "Questembert",
-  "Malansac",
-  "Redon",
-  "Séverac",
-  "Saint-Gildas-des-Bois",
-  "Drefféac",
-  "Pontchâteau",
-  "Savenay",
-  "Cordemais",
-  "Saint-Etienne-de-Montluc",
-  "Couëron",
-  "Basse Indre – Saint-Herblain",
-  "Chantenay",
+  "Amboise",
+  "Ancenis",
+  "La Angers-Saint-Laud-Landerneau",
+  "Batz-sur-Mer",
+  "Baule",
+  "Blois-Chambord",
+  "Chaingy-Fourneaux-Plage",
+  "Chouzy",
+  "La Baule-Escoublac",
+  "La Baule-les-Pins",
+  "La Chapelle-Saint-Mesmin",
+  "La Chaussée-Saint-Victor",
+  "Le Croisic",
+  "Le Pouliguen",
+  "Les Aubrais",
+  "Limeray",
+  "Menars",
+  "Mer",
+  "Meung-sur-Loire",
+  "Montlouis-sur-Loire",
   "Nantes",
-  "Masserac",
-  "Beslé",
-  "Fougeray-Langon",
-  "Messac-Guipry",
-  "Pléchâtel",
-  "Saint-Senoux-Pléchâtel",
-  "Guichen-Bourg-des-Comptes",
-  "Laillé",
-  "Bruz",
-  "Ker Lann",
-  "Saint-Jacques-de-la-Lande",
-  "Rennes",
-  "Laval",
-  "Le Mans",
-  "Massy TGV",
-  "Paris Montparnasse",
+  "Noizay",
+  "Onzain-Chaumont-sur-Loire",
+  "Orléans",
+  "Pornichet",
+  "Saint-Ay",
+  "Saint-Nazaire",
+  "Saint-Pierre-des-Corps",
+  "Saumur",
+  "Suèvres",
+  "Tours",
+  "Veuves-Monteaux",
 ];
 
 const streetsList = [
@@ -622,62 +607,39 @@ const startSurvey = () => {
   currentStep.value = "survey";
   answers.value = {};
   isSurveyComplete.value = false;
-  questionPath.value = ["Poste"]; // Always start with Poste in the path
-  currentQuestionIndex.value = 0; // Always start at index 0 (Poste)
-
-  // Check if Poste was already selected in this session
-  const sessionPoste = sessionStorage.getItem("selectedPoste");
-  if (sessionPoste) {
-    // If Poste was already selected, move to Q1
-    selectedPoste.value = sessionPoste;
-    // Find the index of the stored Poste text
-    const posteIndex = questions[0].options.findIndex(
-      (opt) => opt.text === sessionPoste
-    );
-    answers.value["Poste"] = posteIndex + 1; // Store index + 1
-    currentQuestionIndex.value = 1;
-    questionPath.value = ["Poste", "Q1"];
-  }
+  questionPath.value = ["Q1"]; // Start with Q1
+  currentQuestionIndex.value = 0;
 };
 
 const selectAnswer = (option, index) => {
-  if (currentQuestion.value) {
-    // Special handling for Poste question
-    if (currentQuestion.value.id === "Poste") {
-      selectedPoste.value = option.text;
-      sessionStorage.setItem("selectedPoste", option.text);
-      answers.value["Poste"] = index + 1; // Store index + 1 instead of text
-    } else {
-      answers.value[currentQuestion.value.id] = index + 1;
-    }
+  answers.value[currentQuestion.value.id] = index + 1;
 
-    // Special handling for Q2 and Q2_nonvoyageur
-    if (
-      currentQuestion.value.id === "Q2" ||
-      currentQuestion.value.id === "Q2_nv" ||
-      currentQuestion.value.id === "Q2_d"
-    ) {
-      if (index === 0) {
-        // "Beaugency" selected
-        const questionPrefix =
-          currentQuestion.value.id === "Q2"
-            ? "Q2"
-            : currentQuestion.value.id === "Q2_d"
-            ? "Q2_d"
-            : "Q2_nv";
-        answers.value[`Q2_COMMUNE`] = "BEAUGENCY";
-        answers.value["CODE_INSEE"] = "45028";
-        answers.value["COMMUNE_LIBRE"] = "";
-      }
+  // Special handling for Q2 and Q2_nonvoyageur
+  if (
+    currentQuestion.value.id === "Q2" ||
+    currentQuestion.value.id === "Q2_nv" ||
+    currentQuestion.value.id === "Q2_d"
+  ) {
+    if (index === 0) {
+      // "Beaugency" selected
+      const questionPrefix =
+        currentQuestion.value.id === "Q2"
+          ? "Q2"
+          : currentQuestion.value.id === "Q2_d"
+          ? "Q2_d"
+          : "Q2_nv";
+      answers.value[`Q2_COMMUNE`] = "BEAUGENCY";
+      answers.value["CODE_INSEE"] = "45028";
+      answers.value["COMMUNE_LIBRE"] = "";
     }
+  }
 
-    if (option.next === "end") {
-      finishSurvey();
-    } else if (option.requiresPrecision) {
-      nextQuestion(option.next);
-    } else {
-      nextQuestion();
-    }
+  if (option.next === "end") {
+    finishSurvey();
+  } else if (option.requiresPrecision) {
+    nextQuestion(option.next);
+  } else {
+    nextQuestion();
   }
 };
 
@@ -886,7 +848,7 @@ const finishSurvey = async () => {
   const isPassenger = answers.value["Q1"] === 1;
   const questionPrefix = isPassenger ? "Q2" : "Q2_nonvoyageur";
 
-  // Create a new answers object with Poste first
+  // Create answers object
   const orderedAnswers = {
     ID_questionnaire: uniqueId,
     HEURE_DEBUT: startDate.value,
@@ -898,19 +860,15 @@ const finishSurvey = async () => {
       minute: "2-digit",
       second: "2-digit",
     }),
-    Poste: answers.value["Poste"],
     TYPE_QUESTIONNAIRE: isPassenger ? "Passager" : "Non-passager",
     [`${questionPrefix}_COMMUNE`]:
       answers.value[`${questionPrefix}_COMMUNE`] || "",
     CODE_INSEE: answers.value["CODE_INSEE"] || "",
   };
 
-  // Add the rest of the answers
+  // Add all answers
   Object.keys(answers.value).forEach((key) => {
-    if (key !== "Poste") {
-      // Skip Poste as it's already added
-      orderedAnswers[key] = answers.value[key];
-    }
+    orderedAnswers[key] = answers.value[key];
   });
 
   await addDoc(surveyCollectionRef, orderedAnswers);

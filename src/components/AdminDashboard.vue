@@ -160,7 +160,6 @@ const downloadData = async () => {
       "HEURE_DEBUT",
       "HEURE_FIN",
       "TYPE_QUESTIONNAIRE",
-      "Poste",
       "Q1",
       "Q2",
       "CODE_INSEE",
