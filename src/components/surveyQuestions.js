@@ -170,7 +170,7 @@ export const questions = [
 	},
 	{
 		id: "Q2_d",
-		text: "Quelle est la destination de votre déplacement? = Où allez-vous en quittant la gare?",
+		text: "Quelle est la destination de votre déplacement ? (Où allez-vous en quittant la gare ?)",
 		options: [
 			{ text: "Beaugency", next: "Q2a_d" },
 			{ text: "Autre commune", next: "Q2d_precision", requiresPrecision: true },
@@ -191,7 +191,7 @@ export const questions = [
 	},
 	{
 		id: "Q3_d",
-		text: "Quel mode de transport avez-vous utilisé pour quitter la gare ?",
+		text: "Quel mode de transport allez-vous utilisé pour quitter la gare ?",
 		options: [
 			{ text: "A pied", next: "Q4_d" },
 			{ text: "En voiture -- en tant que conducteur", next: "Q3a_d" },
@@ -230,13 +230,12 @@ export const questions = [
 		id: "Q3b_d",
 		text: "Où allez-vous être récupéré ?",
 		options: [
-			{ text: "Au niveau de la dépose-minute devant le bâtiment voyageur au Nord", next: "Q4_d" },
-			{ text: "Au niveau du parking ou de la rue Beauvais au Nord", next: "Q4_d" },
-			{ text: "Au niveau de la dépose-minute devant le parvis au Sud", next: "Q4_d" },
+			{ text: "Au niveau du dépose-minute devant le bâtiment voyageur au sud", next: "Q4_d" },
+			{ text: "Sur le parking de la gare", next: "Q4_d" },
+			{ text: "Directement sur la rue de la Gare devant la gare", next: "Q4_d" },
 			{ text: "Autre", next: "Q3b_d_precision", requiresPrecision: true },
 		],
 	},
-
 	{
 		id: "Q3b_d_precision",
 		text: "Veuillez préciser l'endroit où vous allez être récupéré :",
@@ -266,7 +265,6 @@ export const questions = [
 		options: [
 			{ text: "Oui", next: "Q5_d" },
 			{ text: "Non", next: "Q5_d" },
-			{ text: "Non mais j'envisage d'en prendre un dans les mois qui viennent", next: "Q5_d" },
 		],
 	},
 
@@ -384,9 +382,9 @@ export const questions = [
 		id: "Q3b_nv",
 		text: "Où vous êtes-vous fait déposer ?",
 		options: [
-			{ text: "Au niveau de la dépose-minute devant le bâtiment voyageur au Nord", next: "Q4_nv" },
-			{ text: "Au niveau du parking ou de la rue Beauvais au Nord", next: "Q4_nv" },
-			{ text: "Au niveau de la dépose-minute devant le parvis au Sud", next: "Q4_nv" },
+			{ text: "Au niveau du dépose-minute devant le bâtiment voyageur au sud", next: "Q4_nv" },
+			{ text: "Sur le parking de la gare", next: "Q4_nv" },
+			{ text: "Directement sur la rue de la Gare devant la gare", next: "Q4_nv" },
 			{ text: "Autre", next: "Q3b_precis_nv", requiresPrecision: true },
 		],
 	},
